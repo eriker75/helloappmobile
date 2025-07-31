@@ -100,20 +100,21 @@ const AddYourPicturesScreen = () => {
     }
 
     if (!result.canceled && result.assets[0]) {
-      const newPhotoUri = result.assets[0].uri;
+      const asset = result.assets[0];
+      const onboardingImage = { uri: asset.uri, file: asset };
 
       if (isMainPhoto) {
-        setMainPicture(newPhotoUri);
+        setMainPicture(onboardingImage);
       } else {
         if (photoIndex !== undefined) {
           // Reemplazar foto existente
           const updatedPhotos = [...secondaryPictures];
-          updatedPhotos[photoIndex] = newPhotoUri;
+          updatedPhotos[photoIndex] = onboardingImage;
           setSecondaryPictures(updatedPhotos);
         } else {
           // Agregar nueva foto
           if (secondaryPictures.length < 4) {
-            addSecondaryPicture(newPhotoUri);
+            addSecondaryPicture(onboardingImage);
           }
         }
       }
@@ -121,8 +122,7 @@ const AddYourPicturesScreen = () => {
   };
 
   const handleRemoveSecondaryPhoto = (index: number) => {
-    const updatedPhotos = secondaryPictures.filter((_, i) => i !== index);
-    setSecondaryPictures(updatedPhotos);
+    setSecondaryPictures(secondaryPictures.filter((_, i) => i !== index));
   };
 
   useEffect(() => {
@@ -142,6 +142,51 @@ const AddYourPicturesScreen = () => {
         "Fotos requeridas",
         "Debes seleccionar al menos una foto principal para continuar"
       );
+    }
+  };
+
+  // SUBMIT HANDLER for onboarding with images
+  const handleSubmitOnboarding = async (profileFields: any) => {
+    try {
+      if (!mainPicture || !mainPicture.file) {
+        Alert.alert("Error", "Debes seleccionar una foto principal.");
+        return;
+      }
+      if (secondaryPictures.length !== 4 || secondaryPictures.some(img => !img.file)) {
+        Alert.alert("Error", "Debes seleccionar 4 fotos secundarias.");
+        return;
+      }
+
+      const formData = new FormData();
+      // Profile fields
+      Object.entries(profileFields).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          formData.append(key, String(value));
+        }
+      });
+      // Images
+      formData.append("mainImage", {
+        uri: mainPicture.file.uri,
+        name: mainPicture.file.fileName || "main.jpg",
+        type: mainPicture.file.mimeType || "image/jpeg",
+      } as any);
+      secondaryPictures.forEach((img, idx) => {
+        formData.append("secondaryImages", {
+          uri: img.file.uri,
+          name: img.file.fileName || `secondary${idx + 1}.jpg`,
+          type: img.file.mimeType || "image/jpeg",
+        } as any);
+      });
+
+      // Import repository dynamically to avoid circular deps
+      const { OnboardingRepository } = await import("@/src/features/users/repositories/onboarding.repository");
+      await OnboardingRepository.submitOnboardingWithImages(formData);
+
+      Alert.alert("Éxito", "Onboarding completado con imágenes.");
+      router.push("/dashboard/radar");
+    } catch (error) {
+      Alert.alert("Error", "No se pudo completar el onboarding.");
+      console.error(error);
     }
   };
 
@@ -183,7 +228,7 @@ const AddYourPicturesScreen = () => {
             >
               {mainPicture ? (
                 <Image
-                  source={{ uri: mainPicture }}
+                  source={{ uri: mainPicture?.uri }}
                   className="w-full h-full rounded-full"
                 />
               ) : (
@@ -231,7 +276,7 @@ const AddYourPicturesScreen = () => {
                   >
                     {secondaryPhotoUri ? (
                       <Image
-                        source={{ uri: secondaryPhotoUri }}
+                        source={{ uri: secondaryPhotoUri?.uri }}
                         className="w-full h-full rounded-full"
                       />
                     ) : (

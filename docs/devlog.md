@@ -1,3 +1,9 @@
+## 2025-07-31 – Migración de carga de imágenes de onboarding a backend NestJS
+
+- **Task:** [2025-07-31-onboarding-images-backend-upload.md](2025-07-31-onboarding-images-backend-upload.md)
+- **Summary:** Se migró el flujo de carga de imágenes de onboarding para que el frontend (React Native Expo) envíe 1 imagen principal y 4 secundarias al backend NestJS mediante un endpoint `multipart/form-data` usando `nestjs-form-data`. El backend almacena las imágenes usando el módulo de archivos (local o S3) y devuelve las URLs. Se eliminaron las dependencias de Supabase para imágenes en el frontend.
+- **Impact:** El proceso de onboarding ahora es más seguro y centralizado, permitiendo control total sobre el almacenamiento y validación de imágenes. Se actualizaron los DTOs, servicios, tests y documentación para reflejar el nuevo flujo. El frontend ahora envía archivos reales y no solo URIs.
+
 ## 2025-07-31 – Migración de Supabase a Node.js + Socket.IO (NestJS)
 
 - **Task:** [2025-07-31-migracion-supabase-socketio-node.md](2025-07-31-migracion-supabase-socketio-node.md)

@@ -4,10 +4,14 @@ export interface Chat {
   id: string;
   createdAt: string; // ISO string for frontend
   updatedAt: string;
-  isActive: boolean;
-  type: 'private' | 'group' | string;
+  isActive?: boolean;
+  readed?: boolean | null;
+  deleted?: boolean | null;
+  type: 'individual' | 'group' | string;
   lastMessage?: Message;
   description?: string | null;
+  parentId?: string | null;
+  draftContent?: string | null;
   creator?: {
     id: string;
     name?: string;

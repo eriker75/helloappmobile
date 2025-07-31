@@ -1,14 +1,14 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ChatRepository } from '../repositories/chat.repository';
-import { CreateChatDto } from '../dtos/create-chat.dto';
-import { AddMessageToChatDto } from '../dtos/add-message-to-chat.dto';
-import { UpdateChatDto } from '../dtos/update-chat.dto';
-import { DeleteChatDto } from '../dtos/delete-chat.dto';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ChatRepository } from "../repositories/chat.repository";
+import { CreateChatDto } from "../dtos/create-chat.dto";
+import { AddMessageToChatDto } from "../dtos/add-message-to-chat.dto";
+import { UpdateChatDto } from "../dtos/update-chat.dto";
+import { DeleteChatDto } from "../dtos/delete-chat.dto";
 
 // Query to fetch all chats
 export function useChatsQuery() {
   return useQuery({
-    queryKey: ['chats'],
+    queryKey: ["chats"],
     queryFn: () => ChatRepository.getChats(),
   });
 }
@@ -16,7 +16,7 @@ export function useChatsQuery() {
 // Query to fetch messages for a chat
 export function useMessagesQuery(chatId: string) {
   return useQuery({
-    queryKey: ['chats', chatId, 'messages'],
+    queryKey: ["chats", chatId, "messages"],
     queryFn: () => ChatRepository.getMessages(chatId),
     enabled: !!chatId,
   });
@@ -28,7 +28,7 @@ export function useCreateChatMutation() {
   return useMutation({
     mutationFn: (dto: CreateChatDto) => ChatRepository.createChat(dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chats'] });
+      queryClient.invalidateQueries({ queryKey: ["chats"] });
     },
   });
 }
@@ -37,9 +37,12 @@ export function useCreateChatMutation() {
 export function useSendMessageMutation(chatId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (dto: AddMessageToChatDto) => ChatRepository.sendMessage(chatId, dto),
+    mutationFn: (dto: AddMessageToChatDto) =>
+      ChatRepository.sendMessage(chatId, dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chats', chatId, 'messages'] });
+      queryClient.invalidateQueries({
+        queryKey: ["chats", chatId, "messages"],
+      });
     },
   });
 }
@@ -50,7 +53,7 @@ export function useUpdateChatMutation(chatId: string) {
   return useMutation({
     mutationFn: (dto: UpdateChatDto) => ChatRepository.updateChat(chatId, dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chats'] });
+      queryClient.invalidateQueries({ queryKey: ["chats"] });
     },
   });
 }
@@ -61,7 +64,7 @@ export function useDeleteChatMutation(chatId: string) {
   return useMutation({
     mutationFn: (dto: DeleteChatDto) => ChatRepository.deleteChat(chatId, dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chats'] });
+      queryClient.invalidateQueries({ queryKey: ["chats"] });
     },
   });
 }
@@ -72,7 +75,9 @@ export function useMarkMessagesReadMutation(chatId: string) {
   return useMutation({
     mutationFn: () => ChatRepository.markMessagesRead(chatId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chats', chatId, 'messages'] });
+      queryClient.invalidateQueries({
+        queryKey: ["chats", chatId, "messages"],
+      });
     },
   });
 }

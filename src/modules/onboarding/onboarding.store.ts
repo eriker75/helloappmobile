@@ -8,6 +8,11 @@ import {
   step4Schema,
 } from "./onboarding.schemas";
 
+export interface OnboardingImage {
+  uri: string;
+  file: any | null; // File or Expo Asset
+}
+
 export interface OnboardingState {
   name: string;
   alias: string;
@@ -15,8 +20,8 @@ export interface OnboardingState {
   bio: string;
   gender: string;
   interestedIn: string[];
-  mainPicture: string;
-  secondaryPictures: string[];
+  mainPicture: OnboardingImage | null;
+  secondaryPictures: OnboardingImage[];
   selectedAddress: string;
   selectedLocation: Location | null;
 }
@@ -33,10 +38,10 @@ export interface OnboardingActions {
   removeInterest: (interestedIn: string) => void;
 
   // Photos
-  setMainPicture: (mainPicture: string) => void;
-  setSecondaryPictures: (secondaryPictures: string[]) => void;
-  addSecondaryPicture: (picture: string) => void;
-  removeSecondaryPicture: (picture: string) => void;
+  setMainPicture: (mainPicture: OnboardingImage) => void;
+  setSecondaryPictures: (secondaryPictures: OnboardingImage[]) => void;
+  addSecondaryPicture: (picture: OnboardingImage) => void;
+  removeSecondaryPicture: (index: number) => void;
 
   // Location
   setSelectedLocation: (address: string, location: Location | null) => void;
@@ -55,7 +60,7 @@ const initialState: OnboardingState = {
   bio: "",
   gender: "",
   interestedIn: [],
-  mainPicture: "",
+  mainPicture: null,
   secondaryPictures: [],
   selectedAddress: "",
   selectedLocation: null,
@@ -87,9 +92,9 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
       set((state) => ({
         secondaryPictures: [...state.secondaryPictures, picture],
       })),
-    removeSecondaryPicture: (picture) =>
+    removeSecondaryPicture: (index) =>
       set((state) => ({
-        secondaryPictures: state.secondaryPictures.filter((p) => p !== picture),
+        secondaryPictures: state.secondaryPictures.filter((_, i) => i !== index),
       })),
 
     // Location
@@ -117,8 +122,8 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
             return true;
           case 3:
             await step3Schema.parseAsync({
-              mainPicture: state.mainPicture,
-              secondaryPictures: state.secondaryPictures,
+              mainPicture: state.mainPicture?.uri,
+              secondaryPictures: state.secondaryPictures.map((img) => img.uri),
             });
             return true;
           case 4:
@@ -142,22 +147,7 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>(
       const authStore = useAuthUserProfileStore.getState();
 
       // Convertir datos de onboarding a formato de perfil de usuario
-      const profileUpdates = {
-        name: state.name,
-        alias: state.alias,
-        bio: state.bio,
-        birth_date: state.birth_date,
-        gender: state.gender === "1" ? 0 : state.gender === "2" ? 1 : 2,
-        interested_in: state.interestedIn,
-        avatar: state.mainPicture,
-        address: state.selectedAddress,
-        location: state.selectedLocation
-          ? JSON.stringify(state.selectedLocation)
-          : null,
-        is_onboarded: 1,
-      };
-
-      await authStore.updateUserProfile(profileUpdates);
+      // This method will be replaced in the UI to build FormData and call the API
     },
 
     // Reset

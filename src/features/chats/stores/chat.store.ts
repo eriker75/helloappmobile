@@ -14,6 +14,10 @@ export interface ChatState {
 // Actions interface
 export interface ChatActions {
   setChats: (chats: Chat[]) => void;
+  addChat: (chat: Chat) => void;
+  addChats: (chats: Chat[]) => void;
+  updateChat: (chat: Chat) => void;
+  deleteChat: (chatId: string) => void;
   setMessages: (chatId: string, messages: Message[]) => void;
   addMessage: (chatId: string, message: Message) => void;
   updateMessage: (chatId: string, message: Message) => void;
@@ -35,6 +39,39 @@ const createChatStore = (
   setChats: (chats) =>
     set((state) => {
       state.chats = chats;
+      return state;
+    }),
+  addChat: (chat) =>
+    set((state) => {
+      // Avoid duplicates by id
+      if (!state.chats.some((c) => c.id === chat.id)) {
+        state.chats.push(chat);
+      }
+      return state;
+    }),
+  addChats: (chats) =>
+    set((state) => {
+      // Add only new chats (by id)
+      const existingIds = new Set(state.chats.map((c) => c.id));
+      const newChats = chats.filter((c) => !existingIds.has(c.id));
+      state.chats.push(...newChats);
+      return state;
+    }),
+  updateChat: (chat) =>
+    set((state) => {
+      const idx = state.chats.findIndex((c) => c.id === chat.id);
+      if (idx !== -1) {
+        state.chats[idx] = { ...state.chats[idx], ...chat };
+      }
+      return state;
+    }),
+  deleteChat: (chatId) =>
+    set((state) => {
+      state.chats = state.chats.filter((c) => c.id !== chatId);
+      // Optionally, also remove messages for this chat
+      if (state.messages[chatId]) {
+        delete state.messages[chatId];
+      }
       return state;
     }),
   setMessages: (chatId, messages) =>
