@@ -1,3 +1,13 @@
+## 2025-07-31 – Migración de Supabase a Node.js + Socket.IO (NestJS)
+
+- **Task:** [2025-07-31-migracion-supabase-socketio-node.md](2025-07-31-migracion-supabase-socketio-node.md)
+- **Summary:** Se migró la lógica de tiempo real y persistencia de datos de Supabase a un backend propio en Node.js usando NestJS y Socket.IO. Se implementó el módulo `chats` en frontend siguiendo el patrón modular: repositories (usando `api.ts` y axios), services (con React Query), hooks (integración con React y suscripción a eventos en tiempo real vía Socket.IO), y stores (Zustand para manejo de estado y sincronización). La arquitectura es ahora más flexible, escalable y desacoplada de proveedores externos.
+- **Impact:** El sistema de chats es completamente funcional usando el backend NestJS, con soporte para eventos en tiempo real, caché y sincronización eficiente. Se eliminó toda dependencia de Supabase en la capa de features. La documentación y el historial de desarrollo fueron actualizados.
+## 2025-07-31 – Integración de Immer en el store de perfil de usuario autenticado
+
+- **Task:** [2025-07-31-auth-store-immer-integration.md](2025-07-31-auth-store-immer-integration.md)
+- **Summary:** Se integró el middleware `immer` de Zustand en el store de perfil de usuario autenticado (`auth-user-profile.store.ts`). Ahora las acciones de actualización de estado usan lógica mutativa, facilitando la mantenibilidad y reduciendo errores en actualizaciones inmutables.
+- **Impact:** El store es más fácil de mantener y escalar, con actualizaciones de estado más legibles y seguras. No se modificó la API pública ni el comportamiento externo del store.
 ## 2025-07-30 – Fix: Avatares de usuarios cercanos desaparecen tras reload en radar
 
 - **Task:** [2025-07-30-radar-avatar-hydration-fix.md](2025-07-30-radar-avatar-hydration-fix.md)

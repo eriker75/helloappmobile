@@ -21,27 +21,24 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { getPaginatedUserChats } from "../repositories/chat.repository";
 
 /**
-* Infinite query for paginated chats for a user.
-* Uses cursor-based pagination (last_message_date).
-*/
+ * Infinite query for paginated chats for a user.
+ * Uses cursor-based pagination (last_message_date).
+ */
 export function usePaginatedUserChats(userId: string, pageSize: number = 20) {
- return useInfiniteQuery<
-   { chats: any[]; nextCursor: string | null },
-   Error
- >({
-   queryKey: ["paginated-chats", userId],
-   queryFn: async (context) =>
-     getPaginatedUserChats(
-       userId,
-       pageSize,
-       (context.pageParam as string | null) ?? null
-     ),
-   getNextPageParam: (lastPage) => lastPage?.nextCursor ?? null,
-   initialPageParam: null,
-   enabled: !!userId,
-   refetchOnMount: true,
-   refetchOnReconnect: true,
- });
+  return useInfiniteQuery<{ chats: any[]; nextCursor: string | null }, Error>({
+    queryKey: ["paginated-chats", userId],
+    queryFn: async (context) =>
+      getPaginatedUserChats(
+        userId,
+        pageSize,
+        (context.pageParam as string | null) ?? null
+      ),
+    getNextPageParam: (lastPage) => lastPage?.nextCursor ?? null,
+    initialPageParam: null,
+    enabled: !!userId,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+  });
 }
 
 // Fetch all chats (from chats table)
